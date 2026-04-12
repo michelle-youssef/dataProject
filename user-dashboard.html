@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>My Orders — Ur Food</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <nav>
+    <a href="index.html" class="nav-logo">🍇 Ur<span>Food</span></div>
+    <ul class="nav-links">
+      <li><a href="browse.html">Browse Bundles</a></li>
+      <li><a href="#" onclick="logout()">Logout</a></li>
+    </ul>
+  </nav>
+
+  <div class="dashboard">
+    <div class="dashboard-header">
+      <h1>My Orders 🔮</h1>
+      <p>Welcome back, ${currentUser.name}! Here are your claimed bundles.</p>
+    </div>
+
+    <!-- Stats -->
+    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:1rem; margin-bottom:2rem;">
+      <div style="background:var(--white); border-radius:var(--radius); padding:1.2rem; box-shadow:var(--shadow); text-align:center;">
+        <div style="font-family:'Syne',sans-serif; font-size:2rem; font-weight:800; color:var(--green);" id="total-orders">0</div>
+        <div style="font-size:0.8rem; color:var(--gray); text-transform:uppercase; letter-spacing:0.05em;">Total Orders</div>
+      </div>
+      <div style="background:var(--white); border-radius:var(--radius); padding:1.2rem; box-shadow:var(--shadow); text-align:center;">
+        <div style="font-family:'Syne',sans-serif; font-size:2rem; font-weight:800; color:var(--orange);" id="total-saved">$0</div>
+        <div style="font-size:0.8rem; color:var(--gray); text-transform:uppercase; letter-spacing:0.05em;">Total Saved</div>
+      </div>
+    </div>
+
+    <!-- Orders table -->
+    <div class="orders-table">
+      <table>
+        <thead>
+          <tr>
+            <th>Restaurant</th>
+            <th>Bundle</th>
+            <th>Price</th>
+            <th>Date</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="orders-body">
+        </tbody>
+      </table>
+    </div>
+
+    <div style="margin-top:2rem; text-align:center;">
+      <a href="browse.html" class="btn-primary">Browse More Bundles →</a>
+    </div>
+  </div>
+
+  <footer>
+    <p>♥</p>
+  </footer>
+
+  <script src="js/data.js"></script>
+  <script>
+    const orders = currentUser.claimedOrders;
+    const tbody = document.getElementById('orders-body');
+
+    orders.forEach(order => {
+      const statusClass = order.status === 'Picked up' ? 'status-picked' : 'status-ready';
+      tbody.innerHTML += `
+        <tr>
+          <td><strong>${order.restaurantName}</strong></td>
+          <td>${order.bundleTitle}</td>
+          <td style="color:var(--green); font-weight:600;">$${order.price}</td>
+          <td style="color:var(--gray);">${order.date}</td>
+          <td><span class="status-badge ${statusClass}">${order.status}</span></td>
+        </tr>
+      `;
+    });
+
+    document.getElementById('total-orders').textContent = orders.length;
+    const saved = orders.reduce((sum, o) => sum + o.price, 0);
+    document.getElementById('total-saved').textContent = '$' + saved;
+
+    function logout() {
+      localStorage.removeItem('loggedIn');
+      localStorage.removeItem('userType');
+      window.location.href = 'index.html';
+    }
+  </script>
+
+</body>
+</html>

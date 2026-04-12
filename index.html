@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>UrFood — Save Food in Lebanon</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <nav>
+    <div class="nav-logo">🍇 Ur<span>Food</span></div>
+    <ul class="nav-links">
+      <li><a href="login.html" class="nav-btn">Login</a></li>
+  <li><a href="login.html" class="nav-btn">Sign Up</a></li>
+    </ul>
+  </nav>
+
+  <section class="hero">
+    <div class="hero-content">
+      <h1>Save Food<br/>Save <span>Money</span></h1>
+      <p>Claim surprise bags from your favorite Lebanese restaurants and cafés — at up to 70% off, before they go to waste.</p>
+      <div class="hero-buttons">
+        <a href="browse.html" class="btn-primary">Browse Bundles 🔮</a>
+        <a href="login.html" class="btn-secondary">List Your Restaurant</a>
+      </div>
+    </div>
+  </section>
+
+  <div class="stats-bar">
+    <div class="stat">
+      <div class="stat-number">14+</div>
+      <div class="stat-label">Restaurants</div>
+    </div>
+    <div class="stat">
+      <div class="stat-number">2</div>
+      <div class="stat-label">Cities</div>
+    </div>
+    <div class="stat">
+      <div class="stat-number">70%</div>
+      <div class="stat-label">Average Discount</div>
+    </div>
+    <div class="stat">
+      <div class="stat-number">0 kg</div>
+      <div class="stat-label">Food Wasted</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header">
+      <h2>Today's Bundles 🩷</h2>
+      <p>Fresh surplus food available for pickup tonight</p>
+    </div>
+    <div class="cards-grid" id="featured-cards"></div>
+    <div style="text-align:center; margin-top:2rem;">
+      <a href="browse.html" class="btn-primary">See All Bundles →</a>
+    </div>
+  </div>
+
+  <div class="how-it-works">
+    <div class="section-header">
+      <h2>How It Works</h2>
+      <p>Three simple steps to save food and money</p>
+    </div>
+    <div class="steps-grid">
+      <div class="step">
+        <div class="step-icon">🔍</div>
+        <h3>Browse</h3>
+        <p>Find bundles from restaurants and cafés near you in Beirut and Jbeil</p>
+      </div>
+      <div class="step">
+        <div class="step-icon">✨</div>
+        <h3>Claim</h3>
+        <p>Reserve your bag at a fraction of the original price before it runs out</p>
+      </div>
+      <div class="step">
+        <div class="step-icon">🧚‍♀️</div>
+        <h3>Pick Up</h3>
+        <p>Go to the restaurant and collect your food!</p>
+      </div>
+      <div class="step">
+        <div class="step-icon">🌸</div>
+        <h3>Save the Planet</h3>
+        <p>Every bag you claim means less food wasted in Lebanon</p>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+   
+    <p style="margin-top:6px; font-size:0.8rem;">Fighting food waste one bundle at a time  ♥ </p>
+  </footer>
+
+  <script src="js/data.js"></script>
+  <script>
+    const featured = restaurants.slice(0, 4);
+    const container = document.getElementById('featured-cards');
+    featured.forEach(r => {
+      const discount = Math.round((1 - r.bundle.price / r.bundle.originalPrice) * 100);
+      container.innerHTML += `
+        <div class="bundle-card" onclick="window.location='bundle-detail.html?id=${r.id}'">
+          <div class="card-image">
+            <img src="${r.image}" alt="${r.name}" onerror="this.src='https://via.placeholder.com/400x300?text=${r.name}'"/>
+            <span class="card-badge">-${discount}%</span>
+            <span class="card-qty">🔮 ${r.bundle.quantity} left</span>
+          </div>
+          <div class="card-body">
+            <div class="card-restaurant">${r.name} · ${r.type}</div>
+            <div class="card-title">${r.bundle.title}</div>
+            <div class="card-location">📍 ${r.location}</div>
+            <div class="card-items">
+              ${r.bundle.items.slice(0,3).map(item => `<span class="item-tag">${item}</span>`).join('')}
+              ${r.bundle.items.length > 3 ? `<span class="item-tag">+${r.bundle.items.length - 3} more</span>` : ''}
+            </div>
+            <div class="card-footer">
+              <div class="card-price">
+                <span class="price-new">$${r.bundle.price}</span>
+                <span class="price-old">$${r.bundle.originalPrice}</span>
+              </div>
+              <button class="btn-claim">Claim</button>
+            </div>
+          </div>
+        </div>
+      `;
+    });
+  </script>
+</body>
+</html>
