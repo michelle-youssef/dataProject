@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>My Orders — Ur Food</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <nav>
+    <a href="index.html" class="nav-logo">🍇 Ur<span>Food</span></a>
+    <ul class="nav-links">
+      <li><a href="browse.html">Browse Bundles</a></li>
+      <li><a href="#" onclick="logout()">Logout</a></li>
+    </ul>
+  </nav>
+
+  <div class="dashboard">
+    <div class="dashboard-header">
+      <h1>My Orders 🔮</h1>
+      <p>Welcome back, ${currentUser.name}! Here are your claimed bundles.</p>
+    </div>
+
+    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:1rem; margin-bottom:2rem;">
+      <div style="background:var(--dark2); padding:1.2rem; text-align:center; border:1px solid #1e2a1c;">
+        <div style="font-family:'IM Fell English',serif; font-size:2rem; color:var(--white);" id="total-orders">0</div>
+        <div style="font-size:0.7rem; color:var(--gray); text-transform:uppercase; letter-spacing:0.1em;">Total Orders</div>
+      </div>
+      <div style="background:var(--dark2); padding:1.2rem; text-align:center; border:1px solid #1e2a1c;">
+        <div style="font-family:'IM Fell English',serif; font-size:2rem; color:var(--green-bright);" id="total-saved">$0</div>
+        <div style="font-size:0.7rem; color:var(--gray); text-transform:uppercase; letter-spacing:0.1em;">Total Saved</div>
+      </div>
+    </div>
+
+    <div class="orders-table">
+      <table>
+        <thead>
+          <tr><th>Restaurant</th><th>Bundle</th><th>Price</th><th>Date</th><th>Status</th></tr>
+        </thead>
+        <tbody id="orders-body"></tbody>
+      </table>
+    </div>
+
+    <div style="margin-top:2rem; text-align:center;">
+      <a href="browse.html" class="btn-primary">Browse More Bundles →</a>
+    </div>
+  </div>
+
+  <footer><p>♥</p></footer>
+
+  <script src="js/data.js"></script>
+  <script>
+    const orders = currentUser.claimedOrders;
+    const tbody = document.getElementById('orders-body');
+    orders.forEach(order => {
+      const statusClass = order.status === 'Picked up' ? 'status-picked' : 'status-ready';
+      tbody.innerHTML += `
+        <tr>
+          <td><strong>${order.restaurantName}</strong></td>
+          <td>${order.bundleTitle}</td>
+          <td style="color:var(--green-bright); font-weight:600;">$${order.price}</td>
+          <td style="color:var(--gray);">${order.date}</td>
+          <td><span class="status-badge ${statusClass}">${order.status}</span></td>
+        </tr>`;
+    });
+    document.getElementById('total-orders').textContent = orders.length;
+    document.getElementById('total-saved').textContent = '$' + orders.reduce((s,o)=>s+o.price,0);
+    function logout() {
+      localStorage.removeItem('loggedIn'); localStorage.removeItem('userType');
+      window.location.href = 'index.html';
+    }
+  </script>
+
+  <div id="fairy" onclick="sparkle(this)">🧚‍♀️</div>
+  <style>
+    #fairy {
+      position:fixed; bottom:24px; right:24px; font-size:2.2rem; cursor:pointer; z-index:9999;
+      user-select:none; font-family:monospace; background:#f4f1ec;
+      border:3px solid #2d6a4f; border-radius:8px; padding:6px 8px;
+      box-shadow:4px 4px 0px #1a3d2b, inset 1px 1px 0px rgba(255,255,255,0.9);
+      transition:transform 0.1s, box-shadow 0.1s;
+    }
+    #fairy:hover { box-shadow:2px 2px 0px #1a3d2b, inset 1px 1px 0px rgba(255,255,255,0.9); transform:translate(2px,2px); }
+    #fairy:active { box-shadow:0px 0px 0px #1a3d2b; transform:translate(4px,4px); }
+    .spark { position:fixed; pointer-events:none; font-size:1.1rem; animation:flyup 1s ease-out forwards; z-index:9999; font-family:monospace; }
+    @keyframes flyup { 0%{opacity:1;transform:translateY(0) scale(1)} 25%{transform:translateY(-30px) scale(1.2) rotate(15deg)} 50%{transform:translateY(-60px) scale(0.9) rotate(-15deg)} 100%{opacity:0;transform:translateY(-120px) scale(0.3)} }
+  </style>
+  <script>
+    function sparkle(el) {
+      el.style.transition='transform 0.5s'; el.style.transform='rotate(360deg) scale(1.3)';
+      setTimeout(()=>{el.style.transform='rotate(0deg) scale(1)'},500);
+      const emojis=['✨','💜','🌸','💚','🩷','💫','🌺','💜','✨','🌸','⬛','🟪','🟩','🩷'];
+      for(let i=0;i<14;i++){
+        setTimeout(()=>{
+          const spark=document.createElement('div'); spark.className='spark';
+          spark.textContent=emojis[Math.floor(Math.random()*emojis.length)];
+          spark.style.left=(Math.random()*window.innerWidth)+'px';
+          spark.style.top=(Math.random()*window.innerHeight)+'px';
+          spark.style.fontSize=(Math.random()>0.5?'0.8rem':'1.4rem');
+          document.body.appendChild(spark); setTimeout(()=>spark.remove(),1000);
+        },i*60);
+      }
+    }
+  </script>
+</body>
+</html>
