@@ -116,6 +116,7 @@ nav::after {
   background: radial-gradient(ellipse, rgba(100,160,80,0.08) 0%, transparent 70%);
   border-radius: 50%;
 }
+
 .hero-content { position: relative; z-index: 1; max-width: 720px; margin: 0 auto; }
 .hero h1 {
   font-family: 'IM Fell English', serif;
@@ -410,4 +411,45 @@ footer span { color: var(--hero-green); }
   .hero h1 { font-size: 1.75rem; }
   .section { padding: 35px 1rem; }
   .user-type-toggle { grid-template-columns: 1fr; }
+}
+/* ─── HERO ART ───────────────────────────────────────────── */
+.hero {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+
+}
+.hero-left-art {
+  justify-self: start;
+  transform: translateX(60px) scale(1.1, 1.4);
+  transform-origin: center;
+}
+
+.hero-right-art {
+  justify-self: end;
+  transform: translateX(-100px) scale (4, 4);
+  transform-origin: center;
+}
+.hero-left-art, .hero-right-art {
+  font-size: 0.38rem;
+  line-height: 1.2;
+  color: #98a998;
+  font-family: monospace;
+  user-select: none;
+  flex-shrink: 0;
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 1;
+  max-width: 720px;
+  width: 100%;
+  text-align: center;
+}
+
+@media (max-width: 768px) {
+  .hero-left-art, .hero-right-art { display: none; }
 }
