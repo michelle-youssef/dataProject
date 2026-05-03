@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Bundle Detail — Ur Food</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <nav>
+    <a href="index.html" class="nav-logo">🍇 Ur<span>Food</span></div>
+    <ul class="nav-links">
+      <li><a href="browse.html">Browse</a></li>
+      <li><a href="login.html" class="nav-btn">Login</a></li>
+    </ul>
+  </nav>
+
+  <div class="detail-page" id="detail-content">
+    <!-- Injected by JS -->
+  </div>
+
+  <footer>
+    <p>♥</p>
+  </footer>
+
+  <script src="js/data.js"></script>
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const id = parseInt(params.get('id'));
+    const restaurant = restaurants.find(r => r.id === id);
+    const container = document.getElementById('detail-content');
+
+    if (!restaurant) {
+      container.innerHTML = '<p>Bundle not found. <a href="browse.html">Go back</a></p>';
+    } else {
+      const b = restaurant.bundle;
+      const discount = Math.round((1 - b.price / b.originalPrice) * 100);
+      container.innerHTML = `
+        <a href="browse.html" style="color:var(--green); font-weight:600; display:inline-block; margin-bottom:1.5rem;">← Back to Browse</a>
+        <div class="detail-image">
+          <img src="${restaurant.image}" alt="${restaurant.name}" onerror="this.src='https://via.placeholder.com/800x320?text=${restaurant.name}'"/>
+        </div>
+        <div class="detail-header">
+          <p style="color:var(--gray); margin-bottom:6px;">📍 ${restaurant.location} · ${restaurant.type}</p>
+          <h1>${b.title}</h1>
+          <div class="detail-price">
+            <span class="price-new">$${b.price}</span>
+            <span class="price-old">$${b.originalPrice}</span>
+            <span class="card-badge" style="position:static; display:inline-block;">-${discount}%</span>
+          </div>
+          <p style="color:var(--gray);">⏰ Pickup: ${b.pickupTime}</p>
+          <p style="color:var(--gray); margin-top:4px;">🔮 ${b.quantity} bags left</p>
+        </div>
+        <div class="detail-items">
+          <h3>What's inside this bag?</h3>
+          <p style="color:var(--gray); font-size:0.9rem; margin-bottom:1rem;">${b.description}</p>
+          <div class="items-list">
+            ${b.items.map(item => `<span class="item-tag">${item}</span>`).join('')}
+          </div>
+        </div>
+        <button class="btn-primary" style="width:100%; padding:16px; font-size:1.1rem; border-radius:var(--radius);" onclick="claimBundle()">
+          Claim This Bag for $${b.price} 🔮
+        </button>
+      `;
+    }
+
+    function claimBundle() {
+      const loggedIn = localStorage.getItem('loggedIn');
+      if (!loggedIn) {
+        alert('Please login first to claim a bundle!');
+        window.location.href = 'login.html';
+      } else {
+        alert('Bundle claimed! 🎉 Go pick it up during the pickup window.');
+        window.location.href = 'user-dashboard.html';
+      }
+    }
+  </script>
+
+</body>
+</html>

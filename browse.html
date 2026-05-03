@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Browse Bundles — Ur Food</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <nav>
+    <a href="index.html" class="nav-logo">🍇 Ur<span>Food</span></div>
+    <ul class="nav-links">
+      <li><a href="browse.html">Browse</a></li>
+      <li><a href="user-dashboard.html">My Orders</a></li>
+      <li><a href="login.html" class="nav-btn">Login</a></li>
+    </ul>
+  </nav>
+
+  <div class="section">
+    <div class="section-header">
+      <h2>All Bundles 🔮</h2>
+      <p>Claim before they're gone!</p>
+    </div>
+
+    <!-- Filter buttons -->
+    <div class="filter-bar">
+      <button class="filter-btn active" onclick="filterCards('all', this)">All</button>
+      <button class="filter-btn" onclick="filterCards('restaurant', this)">🍔 Restaurants</button>
+      <button class="filter-btn" onclick="filterCards('cafe', this)">☕ Cafés</button>
+      <button class="filter-btn" onclick="filterCards('Beirut', this)">📍 Beirut</button>
+      <button class="filter-btn" onclick="filterCards('Jbeil', this)">📍 Jbeil</button>
+    </div>
+
+    <!-- Cards -->
+    <div class="cards-grid" id="all-cards"></div>
+  </div>
+
+  <footer>
+    <p>♥</p>
+  </footer>
+
+  <script src="js/data.js"></script>
+  <script>
+    function renderCards(list) {
+      const container = document.getElementById('all-cards');
+      container.innerHTML = '';
+      if (list.length === 0) {
+        container.innerHTML = '<p style="color:var(--gray)">No bundles found.</p>';
+        return;
+      }
+      list.forEach(r => {
+        const discount = Math.round((1 - r.bundle.price / r.bundle.originalPrice) * 100);
+        container.innerHTML += `
+          <div class="bundle-card" onclick="window.location='bundle-detail.html?id=${r.id}'">
+            <div class="card-image">
+              <img src="${r.image}" alt="${r.name}" onerror="this.src='https://via.placeholder.com/400x300?text=${r.name}'"/>
+              <span class="card-badge">-${discount}%</span>
+              <span class="card-qty">🔮 ${r.bundle.quantity} left</span>
+            </div>
+            <div class="card-body">
+              <div class="card-restaurant">${r.name} · ${r.type}</div>
+              <div class="card-title">${r.bundle.title}</div>
+              <div class="card-location">📍 ${r.location}</div>
+              <div class="card-items">
+                ${r.bundle.items.slice(0,3).map(i => `<span class="item-tag">${i}</span>`).join('')}
+                ${r.bundle.items.length > 3 ? `<span class="item-tag">+${r.bundle.items.length - 3} more</span>` : ''}
+              </div>
+              <div class="card-footer">
+                <div class="card-price">
+                  <span class="price-new">$${r.bundle.price}</span>
+                  <span class="price-old">$${r.bundle.originalPrice}</span>
+                </div>
+                <button class="btn-claim">Claim</button>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    function filterCards(filter, btn) {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      if (filter === 'all') return renderCards(restaurants);
+      const filtered = restaurants.filter(r =>
+        r.type === filter || r.city === filter
+      );
+      renderCards(filtered);
+    }
+
+    // Load all on start
+    renderCards(restaurants);
+  </script>
+
+</body>
+</html>
