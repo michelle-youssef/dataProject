@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Browse Bundles — Ur Food</title>
+  <title>Browse Bundles —  Ur Food </title>
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
 
   <nav>
-    <a href="index.html" class="nav-logo">🍇 Ur<span>Food</span></a>
+    <a href="index.html" class="nav-logo">  Ur<span>Food˚ʚ♡ɞ˚</span></a>
     <ul class="nav-links">
       <li><a href="browse.html">Browse</a></li>
       <li><a href="user-dashboard.html">My Orders</a></li>
@@ -19,7 +19,7 @@
 
   <div class="section">
     <div class="section-header">
-      <h2>All Bundles 🔮</h2>
+      <h2>All Bundles ᯓ✿</h2>
       <p>Claim before they're gone!</p>
     </div>
     <div class="filter-bar">
@@ -32,7 +32,7 @@
     <div class="cards-grid" id="all-cards"></div>
   </div>
 
-  <footer><p>♥</p></footer>
+  <footer><p>.₊̣.̩✧ *̣̩˚̣̣⁺̣‧.₊̣̇.‧⁺̣˚̣̣*̣̩⋆·̩̩.̩̥·̩̩⋆*̣̩˚̣̣⁺̣‧.₊̣̇.‧⁺̣˚̣̣*̣̩ ✧·.̩₊̣</p></footer>
 
   <script src="js/data.js"></script>
   <script>
@@ -47,7 +47,7 @@
             <div class="card-image">
               <img src="${r.image}" alt="${r.name}" onerror="this.src='https://via.placeholder.com/400x300?text=${r.name}'"/>
               <span class="card-badge">-${discount}%</span>
-              <span class="card-qty">🔮 ${r.bundle.quantity} left</span>
+              <span class="card-qty">.⋆✴︎ ${r.bundle.quantity} left</span>
             </div>
             <div class="card-body">
               <div class="card-restaurant">${r.name} · ${r.type}</div>
@@ -95,7 +95,7 @@
     function sparkle(el) {
       el.style.transition='transform 0.5s'; el.style.transform='rotate(360deg) scale(1.3)';
       setTimeout(()=>{el.style.transform='rotate(0deg) scale(1)'},500);
-      const emojis=['✨','💜','🌸','💚','🩷','💫','🌺','💜','✨','🌸','⬛','🟪','🟩','🩷'];
+      const emojis = ['🪐','🍓','🌸','🫧','💚','🩷','💫','🌺','💜','✨','🌸','🤎','☕','🩷'];
       for(let i=0;i<14;i++){
         setTimeout(()=>{
           const spark=document.createElement('div'); spark.className='spark';
