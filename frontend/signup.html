@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Sign Up | Ur Food</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <div id="navbar-container"></div>
+
+  <div class="login-page">
+
+    <div class="login-card" autocomplete="off">
+
+      <h2>Join Ur Food!</h2>
+
+      <p>Start saving food and money today</p>
+
+      <div class="form-group">
+
+        <label>I am a...</label>
+
+        <div class="user-type-toggle">
+
+          <button type="button" id="btn-customer" class="type-btn active" onclick="setRole(2)">Customer</button>
+
+          <button type="button" id="btn-restaurant" class="type-btn" onclick="setRole(3)">Restaurant Owner</button>
+
+        </div>
+
+      </div>
+
+      <div class="form-group">
+
+        <label>First Name</label>
+
+        <input type="text" id="firstName" placeholder="Your first name" />
+
+      </div>
+
+      <div class="form-group">
+
+        <label>Last Name</label>
+
+        <input type="text" id="lastName" placeholder="Your last name" />
+
+      </div>
+
+      <div class="form-group">
+
+        <label>Email</label>
+
+        <input type="email" id="email" placeholder="you@example.com" autocomplete="off" />
+
+      </div>
+
+      <div class="form-group">
+
+        <label>Password</label>
+
+        <input type="password" id="password" placeholder="••••••••" autocomplete="new-password"/>
+
+      </div>
+
+      <div class="form-group">
+
+        <label>Phone <span style="opacity:0.5"></span></label>
+
+        <input type="tel" id="phone" placeholder="+961 xx xxx xxx" />
+
+      </div>
+
+      <!-- Restaurant fields — hidden by default -->
+
+      <div id="restaurant-fields" style="display:none;">
+
+        <div style="border-top: 1px solid var(--border); margin: 1.5rem 0; position:relative;">
+
+          <span style="position:absolute; top:-10px; left:50%; transform:translateX(-50%); background:var(--cream-dark); padding:0 10px; font-size:0.72rem; color:var(--gray-text); text-transform:uppercase; letter-spacing:0.1em;">Restaurant Info</span>
+
+        </div>
+
+        <div class="form-group">
+
+          <label>Restaurant Name</label>
+
+          <input type="text" id="rest_name" placeholder="e.g. Roadster Diner" />
+
+        </div>
+
+        <div class="form-group">
+
+          <label>Description</label>
+
+          <textarea id="rest_desc" placeholder="Tell customers about your restaurant..." style="width:100%; padding:12px 16px; border:1px solid var(--border); font-family:'Courier Prime',monospace; font-size:0.95rem; background:var(--cream); color:var(--brown-text); resize:vertical; min-height:90px; outline:none;"></textarea>
+
+        </div>
+
+        <div class="form-group">
+          <label>City</label>
+
+          <select id="rest_city"
+            style="width:100%; padding:12px 16px; border:1px solid var(--border); font-family:'Courier Prime',monospace; font-size:0.95rem; background:var(--cream); color:var(--brown-text); outline:none;">
+            <option value="">Choose city</option>
+            <option value="Jbeil">Jbeil</option>
+            <option value="Beirut">Beirut</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Location Details</label>
+
+          <input 
+            type="text" 
+            id="rest_location_details" 
+            placeholder="e.g. Main road, near LAU, Building name..." 
+          />
+        </div>
+
+        <div class="form-group">
+
+          <label>Opening Hours</label>
+
+          <input type="text" id="rest_hours" placeholder="e.g. 12 PM - 11 PM" />
+
+        </div>
+
+        <div class="form-group">
+
+          <label>Restaurant Photo <span style="opacity:0.5"></span></label>
+
+          <input type="file" id="rest_image" accept="image/*"
+            style="width:100%; padding:10px; border:1px solid var(--border); background:var(--cream); font-family:monospace; cursor:pointer;" />
+
+        </div>
+
+      </div>
+
+      <button class="btn-login" onclick="handleSignup()">Create Account</button>
+
+      <div class="login-footer">Already have an account? <a href="login.html">Sign in</a></div>
+
+      <div id="error-msg" style="color:red; text-align:center; margin-top:1rem; display:none;"></div>
+
+    </div>
+
+  </div>
+
+  <script src="js/navbar.js"></script>
+
+  <script>
+
+    let selectedRole = 2;
+
+    function setRole(role) {
+
+      selectedRole = role;
+
+      const btnCustomer = document.getElementById('btn-customer');
+
+      const btnRestaurant = document.getElementById('btn-restaurant');
+
+      if (role === 2) {
+
+        btnCustomer.classList.add('active');
+
+        btnRestaurant.classList.remove('active');
+
+      } else {
+
+        btnRestaurant.classList.add('active');
+
+        btnCustomer.classList.remove('active');
+
+      }
+
+      document.getElementById('restaurant-fields').style.display = role === 3 ? 'block' : 'none';
+
+    }
+
+    async function handleSignup() {
+
+      const firstName = document.getElementById('firstName').value.trim();
+
+      const lastName  = document.getElementById('lastName').value.trim();
+
+      const email     = document.getElementById('email').value.trim();
+
+      const password  = document.getElementById('password').value;
+
+      const phone     = document.getElementById('phone').value.trim();
+
+      const errorMsg  = document.getElementById('error-msg');
+
+      errorMsg.style.display = 'none';
+
+      // Check required fields
+
+      if (!firstName) {
+
+        errorMsg.textContent = 'Please enter your first name!';
+
+        errorMsg.style.display = 'block';
+
+        return;
+
+      }
+
+      if (!lastName) {
+
+        errorMsg.textContent = 'Please enter your last name!';
+
+        errorMsg.style.display = 'block';
+
+        return;
+
+      }
+
+      if (!email) {
+
+        errorMsg.textContent = 'Please enter your email!';
+
+        errorMsg.style.display = 'block';
+
+        return;
+
+      }
+
+      // Email format validation
+
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+      if (!emailRegex.test(email)) {
+
+        errorMsg.textContent = 'Please enter a valid email address!';
+
+        errorMsg.style.display = 'block';
+
+        return;
+
+      }
+
+      if (!password) {
+
+        errorMsg.textContent = 'Please enter a password!';
+
+        errorMsg.style.display = 'block';
+
+        return;
+
+      }
+
+      if (password.length < 6) {
+
+        errorMsg.textContent = 'Password must be at least 6 characters!';
+
+        errorMsg.style.display = 'block';
+
+        return;
+
+      }
+
+      if (selectedRole === 3) {
+
+        const restName = document.getElementById('rest_name').value.trim();
+
+        const restCity = document.getElementById('rest_city').value.trim();
+
+        const restLocationDetails = document.getElementById('rest_location_details').value.trim();
+
+        const restHours = document.getElementById('rest_hours').value.trim();
+
+        if (!phone) {
+
+          errorMsg.textContent = 'Please enter your phone number for the restaurant account!';
+
+          errorMsg.style.display = 'block';
+
+          return;
+
+        }
+
+        if (!restName) {
+
+          errorMsg.textContent = 'Please enter your restaurant name!';
+
+          errorMsg.style.display = 'block';
+
+          return;
+
+        }
+
+        if (!restCity) {
+
+          errorMsg.textContent = 'Please choose your restaurant city!';
+
+          errorMsg.style.display = 'block';
+
+          return;
+
+        }
+
+        if (!restLocationDetails) {
+
+          errorMsg.textContent = 'Please enter your restaurant location details!';
+
+          errorMsg.style.display = 'block';
+
+          return;
+
+        }
+
+        if (!restHours) {
+
+          errorMsg.textContent = 'Please enter your restaurant opening hours!';
+
+          errorMsg.style.display = 'block';
+
+          return;
+
+        }
+
+      }
+
+      try {
+
+        const response = await fetch('http://localhost:3000/api/signup', {
+
+          method: 'POST',
+
+          headers: { 'Content-Type': 'application/json' },
+
+          body: JSON.stringify({ firstName, lastName, email, password, phone, role: selectedRole })
+
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+
+          errorMsg.textContent = data.message || 'Signup failed';
+
+          errorMsg.style.display = 'block';
+
+          return;
+
+        }
+
+        localStorage.setItem('loggedIn', 'true');
+
+        localStorage.setItem('user', JSON.stringify(data.user));
+
+        localStorage.setItem('user_id', data.user.id);
+
+        localStorage.setItem('role', data.user.roleId);
+
+        localStorage.setItem('first_name', data.user.firstName);
+
+        if (selectedRole === 3) {
+
+          const restName  = document.getElementById('rest_name').value.trim();
+
+          const restDesc  = document.getElementById('rest_desc').value.trim();
+
+          const restCity = document.getElementById('rest_city').value.trim();
+
+          const restLocationDetails = document.getElementById('rest_location_details').value.trim();
+
+          const restAddr = `${restCity} - ${restLocationDetails}`;
+
+          const restHours = document.getElementById('rest_hours').value.trim();
+
+          const imageFile = document.getElementById('rest_image').files[0];
+
+          const formData = new FormData();
+
+          formData.append('name', restName);
+
+          formData.append('description', restDesc);
+
+          formData.append('address', restAddr);
+
+          formData.append('opening_hours', restHours);
+
+          formData.append('contact_person', firstName + ' ' + lastName);
+
+          formData.append('phone', phone);
+
+          formData.append('userId', data.user.id);
+
+          if (imageFile) formData.append('image', imageFile);
+
+          const restaurantResponse = await fetch('http://localhost:3000/api/restaurant/create', {
+
+            method: 'POST',
+
+            body: formData
+
+          });
+
+          const restaurantData = await restaurantResponse.json();
+
+          if (!restaurantResponse.ok) {
+
+            errorMsg.textContent = restaurantData.message || 'Restaurant account was created, but restaurant info could not be saved.';
+
+            errorMsg.style.display = 'block';
+
+            return;
+
+          }
+
+          if (restaurantData.restaurantId) {
+
+            data.user.restaurantId = restaurantData.restaurantId;
+
+            localStorage.setItem('user', JSON.stringify(data.user));
+
+            localStorage.setItem('restaurant_id', restaurantData.restaurantId);
+
+          }
+
+          window.location.href = 'restaurant-dashboard.html';
+
+        } else {
+
+          window.location.href = 'user-dashboard.html';
+
+        }
+
+      } catch (err) {
+
+        errorMsg.textContent = 'Could not connect to server. Is it running?';
+
+        errorMsg.style.display = 'block';
+
+        console.error(err);
+
+      }
+
+    }
+
+  </script>
+
+  <div id="fairy" onclick="sparkle(this)">🧚‍♀️</div>
+
+  <style>
+
+    #fairy {
+
+      position:fixed; bottom:24px; right:24px; font-size:2.2rem; cursor:pointer; z-index:9999;
+
+      user-select:none; font-family:monospace; background:#f4f1ec;
+
+      border:3px solid #2d6a4f; border-radius:8px; padding:6px 8px;
+
+      box-shadow:4px 4px 0px #1a3d2b; transition:transform 0.1s, box-shadow 0.1s;
+
+    }
+
+    #fairy:hover { box-shadow:2px 2px 0px #1a3d2b; transform:translate(2px,2px); }
+
+    #fairy:active { box-shadow:0px 0px 0px #1a3d2b; transform:translate(4px,4px); }
+
+    .spark { position:fixed; pointer-events:none; font-size:1.1rem; animation:flyup 1s ease-out forwards; z-index:9999; }
+
+    @keyframes flyup { 0%{opacity:1;transform:translateY(0)} 100%{opacity:0;transform:translateY(-120px)} }
+
+  </style>
+
+  <script>
+
+    function sparkle(el) {
+
+      el.style.transition='transform 0.5s'; el.style.transform='rotate(360deg) scale(1.3)';
+
+      setTimeout(()=>{el.style.transform='rotate(0deg) scale(1)'},500);
+
+      const emojis = ['🪐','🍓','🌸','🫧','💚','🩷','💫','🌺','💜','✨'];
+
+      for(let i=0;i<14;i++){
+
+        setTimeout(()=>{
+
+          const spark=document.createElement('div'); spark.className='spark';
+
+          spark.textContent=emojis[Math.floor(Math.random()*emojis.length)];
+
+          spark.style.left=(Math.random()*window.innerWidth)+'px';
+
+          spark.style.top=(Math.random()*window.innerHeight)+'px';
+
+          document.body.appendChild(spark);
+
+          setTimeout(()=>spark.remove(),1000);
+
+        },i*60);
+
+      }
+
+    }
+
+  </script>
+
+</body>
+
+</html>

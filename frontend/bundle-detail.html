@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Bundle Detail — Ur Food</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <nav>
+    <a href="index.html" class="nav-logo"> Crave <span> 'N </span>Save˚ʚ♡ɞ˚</a>
+    <ul class="nav-links">
+      <li><a href="browse.html">Browse</a></li>
+      <li id="nav-auth"></li>
+    </ul>
+  </nav>
+
+  <div class="detail-page" id="detail-content">
+    <p style="color:var(--gray-text)">Loading...</p>
+  </div>
+
+  <footer><p>.₊̣.̩✧ *̣̩˚̣̣⁺̣‧.₊̣̇.‧⁺̣˚̣̣*̣̩⋆·̩̩.̩̥·̩̩⋆*̣̩˚̣̣⁺̣‧.₊̣̇.‧⁺̣˚̣̣*̣̩ ✧·.̩₊̣</p></footer>
+
+  <script>
+    const user = JSON.parse(localStorage.getItem('user'));
+    const navAuth = document.getElementById('nav-auth');
+    if (user) {
+      navAuth.innerHTML = `
+        <span style="font-size:0.88rem; font-weight:700; color:var(--sage-dark); letter-spacing:0.06em;">Hello, ${user.firstName} ˚ʚ♡ɞ˚</span>
+        &nbsp;&nbsp;
+        <a href="#" class="nav-btn" onclick="logout()">Logout</a>
+      `;
+    } else {
+      navAuth.innerHTML = `<a href="login.html" class="nav-btn">Login</a>`;
+    }
+    function logout() {
+      localStorage.removeItem('user');
+      localStorage.removeItem('loggedIn');
+      window.location.reload();
+    }
+
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get('id');
+
+    if (!id) window.location.href = 'browse.html';
+
+    const container = document.getElementById('detail-content');
+
+    fetch('http://localhost:3000/api/offers/' + id)
+      .then(res => res.json())
+      .then(o => {
+        const status = Number(o.status_id);
+        const isSoldOut = status === 2;
+        const isExpired = status === 3;
+        const isAvailable = status === 1;
+        const isUnavailable = isSoldOut || isExpired;
+
+        const discount = Math.round((1 - o.discounted_price / o.original_price) * 100);
+        const items = o.description ? o.description.split('\n').filter(i => i.trim()) : [];
+        const pickupStart = o.pickup_start ? o.pickup_start.substring(0, 5) : '';
+        const pickupEnd = o.pickup_end ? o.pickup_end.substring(0, 5) : '';
+        const imgSrc = o.image
+          ? 'http://localhost:3000/' + o.image
+          : 'https://via.placeholder.com/800x320?text=' + encodeURIComponent(o.restaurant_name);
+
+        // Quantity display
+        const quantityHtml = isSoldOut
+          ? '<span style="color:red; font-weight:700;">✗ Sold Out</span>'
+          : isExpired
+          ? '<span style="color:var(--brown-light); font-weight:700;">✗ Expired</span>'
+          : '.⋆✴︎ ' + o.available_quantity + ' bags left';
+
+        // Pickup time display
+        const pickupHtml = isExpired
+          ? '<p style="color:var(--brown-light); margin-top:0.5rem; font-style:italic;"> Was available: ' + pickupStart + ' – ' + pickupEnd + '</p>'
+          : isAvailable
+          ? '<p style="color:var(--gray-text); margin-top:0.5rem;"> Pickup: ' + pickupStart + ' – ' + pickupEnd + '</p>'
+          : '<p style="color:var(--gray-text); margin-top:0.5rem;"> Available: ' + pickupStart + ' – ' + pickupEnd + '</p>';
+
+        // Claim button
+        const claimBtn = isSoldOut
+          ? '<button class="btn-primary" style="width:100%; padding:16px; font-size:0.95rem; opacity:0.5; cursor:not-allowed;" disabled>✗ Sold Out</button>'
+          : isExpired
+          ? '<button class="btn-primary" style="width:100%; padding:16px; font-size:0.95rem; opacity:0.5; cursor:not-allowed;" disabled>✗ This Offer Has Expired</button>'
+          : '<button class="btn-primary" style="width:100%; padding:16px; font-size:0.95rem;" onclick="claimBundle()">☆ Claim This Bag for $' + o.discounted_price + ' ☆</button>';
+
+        container.innerHTML = `
+          <a href="browse.html" style="color:var(--sage-dark); font-weight:700; display:inline-block; margin-bottom:1.5rem; letter-spacing:0.05em; text-transform:uppercase; font-size:0.8rem;">← Back to Browse</a>
+          <div class="detail-image" style="${isUnavailable ? 'filter:grayscale(40%)' : ''}">
+            <img src="${imgSrc}" alt="${o.restaurant_name}"/>
+          </div>
+          <div class="detail-header">
+            <p style="color:var(--gray-text); margin-bottom:6px; font-size:0.82rem; text-transform:uppercase; letter-spacing:0.1em;">📍 ${o.address}</p>
+            <h1>${o.title}</h1>
+            <p style="color:var(--gray-text); font-style:italic; margin-bottom:0.5rem;">${o.restaurant_name}</p>
+            <p style="color:var(--gray-text); font-size:0.9rem; margin-bottom:1rem; line-height:1.6;">${o.restaurant_description || ''}</p>
+            <div class="detail-price">
+              <span class="price-new">$${o.discounted_price}</span>
+              <span class="price-old">$${o.original_price}</span>
+              <span class="card-badge" style="position:static; display:inline-block;">-${discount}%</span>
+            </div>
+            ${pickupHtml}
+            <p style="color:var(--gray-text); margin-top:4px;">${quantityHtml}</p>
+          </div>
+          <div class="detail-items">
+            <h3>What's inside this bag?</h3>
+            <div class="items-list">
+              ${items.map(item => '<span class="item-tag">' + item + '</span>').join('')}
+            </div>
+          </div>
+          ${claimBtn}
+        `;
+      })
+      .catch(err => {
+        container.innerHTML = '<p>Bundle not found. <a href="browse.html">Go back</a></p>';
+        console.error(err);
+      });
+
+function claimBundle() {
+  const user = JSON.parse(localStorage.getItem('user'));
+  if (!user) {
+    alert('Please login first to claim a bundle!');
+    window.location.href = 'login.html';
+    return;
+  }
+
+  console.log("Attempting to claim bundle ID:", id, "for user:", user.id);
+
+  fetch('http://localhost:3000/api/offers/' + id + '/claim', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ userId: user.id })
+  })
+  .then(res => {
+    console.log("Server response status:", res.status);
+    return res.json();
+  })
+  .then(data => {
+    console.log("Server data received:", data);
+    
+    if (data.success === true) {
+      console.log("Success! Redirecting to confirmation...");
+      window.location.href = 'confirmation.html?id=' + id;
+    } else {
+      // If the server says "Success: false", show the reason
+      alert('Claim failed: ' + (data.message || 'Unknown error'));
+    }
+  })
+  .catch(err => {
+    console.error("Fetch error:", err);
+    alert('Could not connect to the server. Make sure your backend is running!');
+  });
+}
+  </script>
+
+  <div id="fairy" onclick="sparkle(this)">🧚‍♀️</div>
+  <style>
+    #fairy {
+      position:fixed; bottom:24px; right:24px; font-size:2.2rem; cursor:pointer; z-index:9999;
+      user-select:none; font-family:monospace; background:#f4f1ec;
+      border:3px solid #2d6a4f; border-radius:8px; padding:6px 8px;
+      box-shadow:4px 4px 0px #1a3d2b, inset 1px 1px 0px rgba(255,255,255,0.9);
+      transition:transform 0.1s, box-shadow 0.1s;
+    }
+    #fairy:hover { box-shadow:2px 2px 0px #1a3d2b, inset 1px 1px 0px rgba(255,255,255,0.9); transform:translate(2px,2px); }
+    #fairy:active { box-shadow:0px 0px 0px #1a3d2b; transform:translate(4px,4px); }
+    .spark { position:fixed; pointer-events:none; font-size:1.1rem; animation:flyup 1s ease-out forwards; z-index:9999; font-family:monospace; }
+    @keyframes flyup { 0%{opacity:1;transform:translateY(0) scale(1)} 25%{transform:translateY(-30px) scale(1.2) rotate(15deg)} 50%{transform:translateY(-60px) scale(0.9) rotate(-15deg)} 100%{opacity:0;transform:translateY(-120px) scale(0.3)} }
+  </style>
+  <script>
+    function sparkle(el) {
+      el.style.transition='transform 0.5s'; el.style.transform='rotate(360deg) scale(1.3)';
+      setTimeout(()=>{el.style.transform='rotate(0deg) scale(1)'},500);
+      const emojis = ['🪐','🍓','🌸','🫧','💚','🩷','💫','🌺','💜','✨','🌸','🤎','☕','🩷'];
+      for(let i=0;i<14;i++){
+        setTimeout(()=>{
+          const spark=document.createElement('div'); spark.className='spark';
+          spark.textContent=emojis[Math.floor(Math.random()*emojis.length)];
+          spark.style.left=(Math.random()*window.innerWidth)+'px';
+          spark.style.top=(Math.random()*window.innerHeight)+'px';
+          spark.style.fontSize=(Math.random()>0.5?'0.8rem':'1.4rem');
+          document.body.appendChild(spark); setTimeout(()=>spark.remove(),1000);
+        },i*60);
+      }
+    }
+  </script>
+
+</body>
+</html>

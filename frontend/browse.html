@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Browse Bundles — Ur Food</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+  <nav>
+    <a href="index.html" class="nav-logo"> Crave <span> 'N </span>Save˚ʚ♡ɞ˚</a>
+    <ul class="nav-links">
+      <li><a href="browse.html">Browse</a></li>
+      <li><a href="user-dashboard.html">My Orders</a></li>
+      <li id="nav-auth"></li>
+    </ul>
+  </nav>
+
+  <div class="section">
+    <div class="section-header">
+      <h2>All Bundles ᯓ✿</h2>
+      <p>Claim before they're gone!</p>
+    </div>
+
+    <div class="filter-bar">
+      <button class="filter-btn active" onclick="filterCards('all', this)">All</button>
+      <button class="filter-btn" onclick="filterCards('Jbeil', this)">📍 Jbeil</button>
+      <button class="filter-btn" onclick="filterCards('Beirut', this)">📍 Beirut</button>
+    </div>
+
+    <div class="cards-grid" id="all-cards">
+      <p style="color:var(--gray-text)">Loading bundles...</p>
+    </div>
+  </div>
+
+  <footer>
+    <p>.₊̣.̩✧ *̣̩˚̣̣⁺̣‧.₊̣̇.‧⁺̣˚̣̣*̣̩⋆·̩̩.̩̥·̩̩⋆*̣̩˚̣̣⁺̣‧.₊̣̇.‧⁺̣˚̣̣*̣̩ ✧·.̩₊̣</p>
+  </footer>
+
+  <script>
+    const API_BASE = 'http://localhost:3000';
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const filterId = urlParams.get('restaurantId');
+
+    // Nav auth
+    const user = JSON.parse(localStorage.getItem('user'));
+    const navAuth = document.getElementById('nav-auth');
+
+    if (user) {
+      navAuth.innerHTML = `
+        <span style="font-size:0.88rem; font-weight:700; color:var(--sage-dark); letter-spacing:0.06em;">
+          Hello, ${user.firstName} ˚ʚ♡ɞ˚
+        </span>
+        &nbsp;&nbsp;
+        <a href="#" class="nav-btn" onclick="logout()">Logout</a>
+      `;
+    } else {
+      navAuth.innerHTML = `<a href="login.html" class="nav-btn">Login</a>`;
+    }
+
+    function logout() {
+      localStorage.removeItem('user');
+      localStorage.removeItem('loggedIn');
+      localStorage.removeItem('user_id');
+      localStorage.removeItem('role');
+      localStorage.removeItem('first_name');
+      localStorage.removeItem('restaurant_id');
+      window.location.reload();
+    }
+
+    let allOffers = [];
+
+    function renderCards(list) {
+      const container = document.getElementById('all-cards');
+      container.innerHTML = '';
+
+      if (!Array.isArray(list) || list.length === 0) {
+        container.innerHTML = '<p style="color:var(--gray-text)">No bundles found.</p>';
+        return;
+      }
+
+      list.forEach(o => {
+        const status = Number(o.status_id);
+
+        const isSoldOut = status === 2;
+        const isExpired = status === 3;
+        const isAvailable = status === 1;
+        const isUnavailable = isSoldOut || isExpired;
+
+        const discount = Math.round((1 - o.discounted_price / o.original_price) * 100);
+        const items = o.description ? o.description.split('\n').filter(i => i.trim()) : [];
+
+        const imgSrc = o.image
+          ? API_BASE + '/' + o.image
+          : 'https://via.placeholder.com/400x300?text=' + encodeURIComponent(o.restaurant_name);
+
+        const pickupStart = o.pickup_start ? o.pickup_start.substring(0, 5) : '';
+        const pickupEnd = o.pickup_end ? o.pickup_end.substring(0, 5) : '';
+
+        let qtyBadge = '.⋆✴︎ ' + o.available_quantity + ' left';
+        let qtyColor = '';
+
+        if (isSoldOut) {
+          qtyBadge = '✗ Sold Out';
+          qtyColor = 'background:rgba(180,0,0,0.7);';
+        }
+
+        if (isExpired) {
+          qtyBadge = '✗ Expired';
+          qtyColor = 'background:rgba(100,80,50,0.7);';
+        }
+
+        let claimBtnText = 'Claim';
+
+        if (isSoldOut) claimBtnText = 'Sold Out';
+        if (isExpired) claimBtnText = 'Expired';
+
+        let pickupLine = '';
+
+        if (isExpired) {
+          pickupLine = '<div class="card-location" style="color:var(--brown-light);"> Was: ' + pickupStart + ' – ' + pickupEnd + '</div>';
+        } else if (isAvailable) {
+          pickupLine = '<div class="card-location"> Pickup: ' + pickupStart + ' – ' + pickupEnd + '</div>';
+        } else {
+          pickupLine = '<div class="card-location" style="color:var(--brown-light);"> ' + pickupStart + ' – ' + pickupEnd + '</div>';
+        }
+
+        container.innerHTML += `
+          <div class="bundle-card" onclick="window.location='bundle-detail.html?id=${o.id}'">
+            <div class="card-image" style="${isUnavailable ? 'filter:grayscale(40%)' : ''}">
+              <img src="${imgSrc}" alt="${o.restaurant_name}"/>
+              <span class="card-badge">-${discount}%</span>
+              <span class="card-qty" style="${qtyColor}">${qtyBadge}</span>
+            </div>
+
+            <div class="card-body">
+              <div class="card-restaurant">${o.restaurant_name} · ${o.address || ''}</div>
+              <div class="card-title">${o.title}</div>
+
+              ${pickupLine}
+
+              <div class="card-items">
+                ${items.slice(0, 3).map(i => '<span class="item-tag">' + i + '</span>').join('')}
+                ${items.length > 3 ? '<span class="item-tag">+' + (items.length - 3) + ' more</span>' : ''}
+              </div>
+
+              <div class="card-footer">
+                <div class="card-price">
+                  <span class="price-new">$${o.discounted_price}</span>
+                  <span class="price-old">$${o.original_price}</span>
+                </div>
+
+                <button class="btn-claim" ${isUnavailable ? 'disabled style="opacity:0.5; cursor:not-allowed;"' : ''}>
+                  ${claimBtnText}
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    function filterCards(filter, btn) {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+
+      if (filter === 'all') {
+        return renderCards(allOffers);
+      }
+
+      renderCards(allOffers.filter(o => o.address && o.address.includes(filter)));
+    }
+
+    async function loadOffers() {
+      try {
+        const response = await fetch(`${API_BASE}/api/offers`);
+        let data = await response.json();
+
+        // This shows ALL offers from database: old + new
+        allOffers = data;
+
+        // If browse.html?restaurantId=... exists, filter by that restaurant
+        if (filterId) {
+          allOffers = allOffers.filter(o => String(o.restaurant_id) === String(filterId));
+        }
+
+        renderCards(allOffers);
+
+      } catch (err) {
+        document.getElementById('all-cards').innerHTML =
+          '<p style="color:red">Could not load bundles. Is the server running?</p>';
+        console.error(err);
+      }
+    }
+
+    loadOffers();
+  </script>
+
+  <div id="fairy" onclick="sparkle(this)">🧚‍♀️</div>
+
+  <style>
+    #fairy {
+      position:fixed; bottom:24px; right:24px; font-size:2.2rem; cursor:pointer; z-index:9999;
+      user-select:none; font-family:monospace; background:#f4f1ec;
+      border:3px solid #2d6a4f; border-radius:8px; padding:6px 8px;
+      box-shadow:4px 4px 0px #1a3d2b, inset 1px 1px 0px rgba(255,255,255,0.9);
+      transition:transform 0.1s, box-shadow 0.1s;
+    }
+
+    #fairy:hover {
+      box-shadow:2px 2px 0px #1a3d2b, inset 1px 1px 0px rgba(255,255,255,0.9);
+      transform:translate(2px,2px);
+    }
+
+    #fairy:active {
+      box-shadow:0px 0px 0px #1a3d2b;
+      transform:translate(4px,4px);
+    }
+
+    .spark {
+      position:fixed;
+      pointer-events:none;
+      font-size:1.1rem;
+      animation:flyup 1s ease-out forwards;
+      z-index:9999;
+      font-family:monospace;
+    }
+
+    @keyframes flyup {
+      0% { opacity:1; transform:translateY(0) scale(1); }
+      25% { transform:translateY(-30px) scale(1.2) rotate(15deg); }
+      50% { transform:translateY(-60px) scale(0.9) rotate(-15deg); }
+      100% { opacity:0; transform:translateY(-120px) scale(0.3); }
+    }
+  </style>
+
+  <script>
+    function sparkle(el) {
+      el.style.transition = 'transform 0.5s';
+      el.style.transform = 'rotate(360deg) scale(1.3)';
+
+      setTimeout(() => {
+        el.style.transform = 'rotate(0deg) scale(1)';
+      }, 500);
+
+      const emojis = ['🪐','🍓','🌸','🫧','💚','🩷','💫','🌺','💜','✨','🌸','🤎','☕','🩷'];
+
+      for (let i = 0; i < 14; i++) {
+        setTimeout(() => {
+          const spark = document.createElement('div');
+          spark.className = 'spark';
+          spark.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+          spark.style.left = (Math.random() * window.innerWidth) + 'px';
+          spark.style.top = (Math.random() * window.innerHeight) + 'px';
+          spark.style.fontSize = (Math.random() > 0.5 ? '0.8rem' : '1.4rem');
+          document.body.appendChild(spark);
+
+          setTimeout(() => spark.remove(), 1000);
+        }, i * 60);
+      }
+    }
+  </script>
+
+</body>
+</html>

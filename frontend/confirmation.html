@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Claim Confirmed — Crave n Save</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    .conf-container {
+      max-width: 600px;
+      margin: 80px auto;
+      text-align: center;
+      padding: 40px 20px;
+      background: #fdfcfb;
+      border: 2px dashed var(--sage-dark);
+      border-radius: 20px;
+    }
+    .conf-icon { font-size: 1rem; margin-bottom: 20px; }
+    .bundle-receipt {
+      background: white;
+      border: 1px solid #eee;
+      padding: 20px;
+      margin: 30px 0;
+      border-radius: 12px;
+      text-align: left;
+    }
+    .receipt-row { display: flex; justify-content: space-between; margin-bottom: 10px; }
+    .receipt-label { font-weight: 700; color: var(--gray-text); }
+  </style>
+</head>
+<body>
+
+  <nav>
+  <a href="index.html" class="nav-logo"> Crave <span> 'N </span>Save˚ʚ♡ɞ˚</a>
+  </nav>
+
+  <div class="conf-container" id="conf-content">
+    <p>Loading your confirmation...</p>
+  </div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get('id');
+    const container = document.getElementById('conf-content');
+
+    if (!id) {
+        window.location.href = 'index.html';
+    } else {
+        fetch('http://localhost:3000/api/offers/' + id)
+          .then(res => res.json())
+          .then(o => {
+            container.innerHTML = `
+              <div class="conf-icon">.₊̣.̩✧ *̣̩˚̣̣⁺̣‧.₊̣̇.‧⁺̣˚̣̣*̣̩⋆·̩̩.̩̥·̩̩⋆*̣̩˚̣̣⁺̣‧.₊̣̇.‧⁺̣˚̣̣*̣̩ ✧·.̩₊̣'</div>
+              <h1 style="color: var(--sage-dark);">Thank you for your purchase!</h1>
+              
+
+              <div class="bundle-receipt">
+                <h3 style="margin-top:0;">Claim Details</h3>
+                <div class="receipt-row">
+                  <span class="receipt-label">Restaurant:</span>
+                  <span>${o.restaurant_name}</span>
+                </div>
+                <div class="receipt-row">
+                  <span class="receipt-label">Bundle:</span>
+                  <span>${o.title}</span>
+                </div>
+                <div class="receipt-row">
+                  <span class="receipt-label">Pickup Time:</span>
+                  <span>${o.pickup_start.substring(0,5)} – ${o.pickup_end.substring(0,5)}</span>
+                </div>
+                <div class="receipt-row">
+                  <span class="receipt-label">Location:</span>
+                  <span>${o.address}</span>
+                </div>
+                <hr style="border: 0; border-top: 1px solid #eee; margin: 15px 0;">
+                <div class="receipt-row" style="font-size: 1.2rem; font-weight: 700;">
+                  <span>Total Paid:</span>
+                  <span style="color: var(--sage-dark);">$${o.discounted_price}</span>
+                </div>
+              </div>
+
+              <p style="font-size: 0.9rem; color: var(--gray-text); margin-bottom: 25px;">
+                Please show this page or your dashboard to the restaurant staff during the pickup window.
+              </p>
+
+              <a href="user-dashboard.html" class="btn-primary">View My Orders</a>
+              <br><br>
+              <a href="index.html" style="color: var(--sage-dark); font-size: 0.8rem;">Back to Home</a>
+            `;
+          })
+          .catch(err => {
+            container.innerHTML = `<h2>Oops!</h2><p>We couldn't load the receipt, but your claim was successful. Check your dashboard.</p>`;
+          });
+    }
+  </script>
+</body>
+</html>
